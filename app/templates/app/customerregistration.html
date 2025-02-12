@@ -1,40 +1,120 @@
-{% extends 'app/base.html' %}
 {% load static %}
-{% block title %}Customer Registration{% endblock title %}
-{% block main-content %}
-<div class="container">
- <div class="row my-3">
-  <div class="col-sm-6 offset-sm-3">
-   <h3>Customer Registration</h3>
-   <hr>
-
-   <form action="" method="post" novalidate class="shadow p-5">
-    <div class="mb-3">
-     <label for="inputEmail4" class="form-label">Email</label>
-     <input type="email" class="form-control" id="inputEmail4">
-     <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registration</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    
+        .register-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+    
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #4A4A4A;
+            font-size: 1.8rem;
+        }
+    
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+    
+        .form-group label {
+            font-size: 0.9rem;
+            color: #4A4A4A;
+        }
+    
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+    
+        .form-group input:focus {
+            border-color: #9face6;
+        }
+    
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #74ebd5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+    
+        .btn:hover {
+            background-color: #5ec5b5;
+        }
+    
+        .register-link {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    
+        .register-link a {
+            color: #74ebd5;
+            text-decoration: none;
+        }
+    
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="register-container">
+        <h2>Customer Registration</h2>
+        <form method="POST" action="{% url 'customerregistration' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="register-link">
+            <p>Already have an account? <a href="{% url 'login_view' %}">Login</a></p>
+        </div>
     </div>
-    <div class="mb-3">
-     <label for="inputPassword1" class="form-label">Password</label>
-     <input type="password" class="form-control" id="inputPassword1">
-    </div>
-    <div class="mb-3">
-     <label for="inputPassword2" class="form-label">Confirm Password</label>
-     <input type="password" class="form-control" id="inputPassword2">
-    </div>
-    <div class="text-end">
-     <button type="button" class="btn btn-danger">Submit</button>
-    </div>
-    <br>
-    <div class="text-center text-primary fw-bold"><small>Existing User ? <a href="{% url 'login' %}"
-       class="text-danger">Login Now</a> </small></div>
-    {% if form.non_field_errors %}
-    {% for error in form.non_field_errors %}
-    <p class="alert alert-danger my-3">{{error}}</p>
-    {% endfor %}
-    {% endif %}
-   </form>
-  </div>
- </div>
-</div>
-{% endblock main-content %}
+</body>
+</html>

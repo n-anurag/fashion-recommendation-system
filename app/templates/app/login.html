@@ -1,28 +1,187 @@
-{% extends 'app/base.html' %}
 {% load static %}
-{% block title %}Login{% endblock title %}
-{% block main-content %}
-<div class="container">
- <div class="row my-3">
-  <div class="col-sm-6 offset-sm-3">
-   <h3>Login</h3>
-   <hr>
-   <form action="" method="post" novalidate class="shadow p-5">
-    <div class="mb-3">
-     <label for="exampleInputEmail1" class="form-label">Email</label>
-     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #4A4A4A;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: #4A4A4A;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #9face6;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #74ebd5;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background-color: #5ec5b5;
+        }
+
+        .register-link {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .register-link a {
+            color: #74ebd5;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Success Message Animation */
+        .success-message {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.5s ease-in-out;
+            z-index: 1000;
+        }
+
+        .success-message.show {
+            top: 20px;
+        }
+
+        .success-message .tick {
+            width: 20px;
+            height: 20px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div id="successMessage" class="success-message">
+                    <div class="tick">✔</div>
+                    <span>{{ message }}</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="login-container">
+        <h2>Login</h2>
+
+        <!-- Display Error Messages -->
+        <div class="messages">
+            {% for message in messages %}
+                {% if message.tags != 'success' %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <form method="POST" action="{% url 'login_view' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <!-- Include the `next` parameter -->
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="btn">Login</button>
+        </form>
+        
+        <div class="register-link">
+            <p>Don't have an account? <a href="{% url 'customerregistration' %}">Register</a></p>
+        </div>
     </div>
-    <div class="mb-3">
-     <label for="exampleInputPassword1" class="form-label">Password</label>
-     <input type="password" class="form-control" id="exampleInputPassword1">
-    </div>
-    <small><a href="#">Forgot Password ?</a></small> <br>
-    <input type="submit" class="btn btn-primary mt-4" value="Login">
-    <br>
-    <div class="text-center text-primary fw-bold"><small>New to ShoppinglyX ? <a href="{% url 'customerregistration' %}"
-       class="text-danger">Create an Account</a> </small></div>
-   </form>
-  </div>
- </div>
-</div>
-{% endblock main-content %}
+
+    <script>
+        // Show the success message with animation
+        window.onload = function() {
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.classList.add('show');
+                // Hide the message after 3 seconds
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 3000);
+            }
+        };
+    </script>
+</body>
+</html>
