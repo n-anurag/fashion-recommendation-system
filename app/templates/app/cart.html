@@ -1,0 +1,78 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart{% endblock title %}
+
+{% block main-content %}
+<style>
+    
+</style>
+<div class="container my-5">
+    <h1 class="text-center mb-5">🛒 Your Shopping Cart</h1>
+    <div class="row">
+        <!-- Cart Items Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="mb-4">Your Cart</h3>
+                    {% if product_name %}
+                    <div class="row align-items-center mb-4">
+                        <!-- Product Image -->
+                        <div class="col-md-3 text-center">
+                            <img src="{% static 'images/'|add:product_name %}" class="img-fluid img-thumbnail shadow-sm" height="150" width="150" alt="Product Image">
+                        </div>
+                        <!-- Product Details -->
+                        <div class="col-md-9">
+                            <h5 class="fw-bold">{{ product_name }}</h5>
+                            <p class="text-muted small">Description: This is a placeholder description for the product.</p>
+                            <!-- Quantity Selector -->
+                            <div class="d-flex align-items-center my-3">
+                                <label for="quantity" class="me-3">Quantity:</label>
+                                <button class="btn btn-outline-secondary btn-sm minus-cart"><i class="fas fa-minus"></i></button>
+                                <span id="quantity" class="mx-3">1</span>
+                                <button class="btn btn-outline-secondary btn-sm plus-cart"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="#" class="btn btn-danger btn-sm">Remove Item</a>
+                                <p class="fw-bold mb-0">Rs. 110.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <p>Your cart is empty. Start adding items to see them here!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="mb-4">Order Summary</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Subtotal
+                            <span>Rs. 110.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Shipping
+                            <span>Rs. 70.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Total (incl. VAT)</strong>
+                            <strong>Rs. 180.00</strong>
+                        </li>
+                    </ul>
+                    <div class="d-grid mt-4">
+                        <a href="{% url 'login_view' %}" class="btn btn-primary btn-lg">Place Order</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main-content %}
