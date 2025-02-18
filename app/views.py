@@ -99,9 +99,7 @@ def change_password(request):
 def mobile(request):
     logger.info('Mobile page accessed')
     return render(request, 'app/mobile.html')
-
-
-
+#This deals with authentication of login
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
