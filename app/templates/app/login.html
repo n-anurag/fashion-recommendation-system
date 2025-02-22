@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,10 +52,6 @@
             outline: none;
         }
 
-        .form-group input:focus {
-            border-color: #9face6;
-        }
-
         .btn {
             width: 100%;
             padding: 0.8rem;
@@ -88,8 +83,8 @@
             text-decoration: underline;
         }
 
-        /* Success Message Animation */
-        .success-message {
+        /* Pop-up Message Styling */
+        .popup-message {
             position: fixed;
             top: -100px;
             left: 50%;
@@ -100,57 +95,29 @@
             border-radius: 10px;
             font-size: 1rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
             transition: all 0.5s ease-in-out;
             z-index: 1000;
         }
 
-        .success-message.show {
-            top: 20px;
+        .popup-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
-        .success-message .tick {
-            width: 20px;
-            height: 20px;
-            background-color: #28a745;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
+        .popup-message.show {
+            top: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- Success Message -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                <div id="successMessage" class="success-message">
-                    <div class="tick">✔</div>
-                    <span>{{ message }}</span>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+
+    <!-- Pop-up Message Container -->
+    <div id="popupMessage" class="popup-message"></div>
 
     <div class="login-container">
         <h2>Login</h2>
 
-        <!-- Display Error Messages -->
-        <div class="messages">
-            {% for message in messages %}
-                {% if message.tags != 'success' %}
-                    <div class="{{ message.tags }}">{{ message }}</div>
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <form method="POST" action="{% url 'login_view' %}">
+        <form method="POST" action="{% url 'login_view' %}" onsubmit="return handleLogin(event)">
             {% csrf_token %}
             <div class="form-group">
                 <label for="username">Username</label>
@@ -160,7 +127,6 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </div>
-            <!-- Include the `next` parameter -->
             <input type="hidden" name="next" value="{{ next }}">
             <button type="submit" class="btn">Login</button>
         </form>
@@ -171,17 +137,43 @@
     </div>
 
     <script>
-        // Show the success message with animation
-        window.onload = function() {
-            const successMessage = document.getElementById('successMessage');
-            if (successMessage) {
-                successMessage.classList.add('show');
-                // Hide the message after 3 seconds
-                setTimeout(() => {
-                    successMessage.classList.remove('show');
-                }, 3000);
-            }
+        // Function to show popup message
+        function showPopupMessage(message, isError = false) {
+            const popup = document.getElementById("popupMessage");
+            popup.textContent = message;
+            popup.className = `popup-message ${isError ? 'error' : ''} show`;
+
+            setTimeout(() => {
+                popup.classList.remove("show");
+            }, 3000);
+        }
+
+        // Check for Django messages and show appropriate popups
+        window.onload = function () {
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        showPopupMessage("{{ message }}", false);
+                    {% elif message.tags == "error" %}
+                        showPopupMessage("{{ message }}", true);
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         };
+
+        // Handle login errors dynamically (Prevents form submission if input fields are empty)
+        function handleLogin(event) {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (!username || !password) {
+                showPopupMessage("Username and password are required!", true);
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
     </script>
+
 </body>
 </html>

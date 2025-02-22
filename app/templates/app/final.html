@@ -2,6 +2,8 @@
 {% load static %}
 {% block title %}Recommendations{% endblock title %}
 {% block main-content %}
+{% load custom_filters %}
+
 <div class="container my-4">
     <style>
         .product-container {
@@ -77,19 +79,21 @@
 
     <!-- Display the recommended products -->
     <div class="product-container">
-        {% for i in context %}
-        <div class="product-card">
-            <img width="200px" height="200px" src="{% static 'images/'|add:i %}" alt="Recommended Image">
-            <h3>Product Name: {{ i }}</h3>
-            <h3>Price: N/A</h3>
-            <form method="POST" action="{% url 'add_to_cart' %}">
-                {% csrf_token %}
-                <input type="hidden" name="product_name" value="{{ i }}">
-                <button type="submit" class="btn">Add to Cart</button>
-            </form>
-        </div>
+        {% for image in context %}
+            <div class="product-card">
+                <img width="200px" height="200px" src="{% static 'images/'|add:image %}" alt="Recommended Image">
+                <h3>Product Name: {{ image }}</h3>
+                <h3>Price: Rs 110 </h3>
+
+                <form method="POST" action="{% url 'add_to_cart' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_name" value="{{ image }}">
+                    <button type="submit" class="btn">Add to Cart</button>
+                </form>
+            </div>
         {% endfor %}
     </div>
+    
     
 </div>
 {% endblock main-content %}

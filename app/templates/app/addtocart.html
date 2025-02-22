@@ -56,7 +56,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Subtotal
-                            <span id="subtotal">Rs. {{ cart_items|length }}</span>
+                            <span id="subtotal">Rs. 110</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Shipping
@@ -64,7 +64,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <strong>Total (incl. VAT)</strong>
-                            <strong id="total">Rs. {{ cart_items|length }}</strong>
+                            <strong id="total">Rs. 0.00</strong>
                         </li>
                     </ul>
                     <div class="d-grid mt-4">
@@ -74,7 +74,7 @@
                         <a href="{% url 'login_view' %}?next={% url 'checkout' %}" class="btn btn-primary btn-lg mb-3">Place Order</a>
                         {% endif %}
                         <a href="{% url 'final' %}" class="btn btn-secondary btn-lg">View More Products</a>
-<a href="{% url 'clear_cart' %}" class="btn btn-danger btn-lg mt-2">Clear Cart</a>
+                        <a href="{% url 'clear_cart' %}" class="btn btn-danger btn-lg mt-2">Clear Cart</a>
                     </div>
                 </div>
             </div>
@@ -85,35 +85,12 @@
 <script>
     const pricePerItem = 110; // Example price per item
 
-    document.querySelectorAll('.plus-cart, .minus-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const productName = this.getAttribute('data-product');
-            const quantitySpan = document.getElementById(`quantity-${productName}`);
-            const priceSpan = document.getElementById(`price-${productName}`);
-            const action = this.classList.contains('plus-cart') ? 'add' : 'subtract';
-
-            // Get current quantity
-            let currentQuantity = parseInt(quantitySpan.textContent);
-
-            if (action === 'add') {
-                currentQuantity += 1;
-            } else if (action === 'subtract' && currentQuantity > 1) {
-                currentQuantity -= 1;
-            }
-
-            // Update quantity and price
-            quantitySpan.textContent = currentQuantity;
-            priceSpan.textContent = `Rs. ${currentQuantity * pricePerItem}`;
-
-            // Update summary
-            updateSummary();
-        });
-    });
-
+    // Function to update the cart summary
     function updateSummary() {
         let totalItems = 0;
         let subtotal = 0;
 
+        // Loop through all the products to calculate the subtotal
         document.querySelectorAll('[id^="quantity-"]').forEach(quantitySpan => {
             const productName = quantitySpan.id.replace('quantity-', '');
             const quantity = parseInt(quantitySpan.textContent);
@@ -121,9 +98,59 @@
             subtotal += quantity * pricePerItem;
         });
 
+        // Update the total items count
         document.getElementById('total-items').textContent = totalItems;
+
+        // Update subtotal
         document.getElementById('subtotal').textContent = `Rs. ${subtotal}`;
-        document.getElementById('total').textContent = `Rs. ${subtotal + 70}`; // Including shipping
+
+        // Update total (including shipping)
+        const shipping = 70;
+        document.getElementById('total').textContent = `Rs. ${subtotal + shipping}`;
     }
+
+    // Event listener for updating quantity
+document.querySelectorAll('.plus-cart, .minus-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const productName = this.getAttribute('data-product');
+        const quantitySpan = document.getElementById(`quantity-${productName}`);
+        const priceSpan = document.getElementById(`price-${productName}`);
+        const action = this.classList.contains('plus-cart') ? 'add' : 'subtract';
+
+        // Get current quantity
+        let currentQuantity = parseInt(quantitySpan.textContent);
+
+        if (action === 'add') {
+            currentQuantity += 1;
+        } else if (action === 'subtract' && currentQuantity > 1) {
+            currentQuantity -= 1;
+        }
+
+        // Update quantity and price
+        quantitySpan.textContent = currentQuantity;
+        priceSpan.textContent = `Rs. ${currentQuantity * pricePerItem}`;
+
+        // Update the session directly after each click
+        fetch("{% url 'update_cart' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+                product_name: productName,
+                quantity: currentQuantity  // Sending updated quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Optionally, update the summary
+            updateSummary();
+        })
+        .catch(error => console.error('Error updating cart:', error));
+    });
+});
+
 </script>
+
 {% endblock main-content %}
